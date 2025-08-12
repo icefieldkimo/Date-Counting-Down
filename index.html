@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>倒數計時器</title>
+  <meta name="description" content="Public Countdown" />
+  <style>
+    :root { --radius: 16px; }
+    body { font-family: system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
+           margin:0; background:#0b0f19; color:#e9eef7; display:flex; min-height:100svh; }
+    .wrap { margin:auto; padding:24px; width:min(920px, 92%); text-align:center; }
+    h1 { margin:0 0 12px; font-size:clamp(22px,5vw,38px); font-weight:700; letter-spacing:.5px; }
+    .meta { opacity:.85; margin-bottom:22px; font-size:14px }
+    .card { background:#131a2a; padding:24px; border-radius:var(--radius); box-shadow:0 8px 28px rgba(0,0,0,.35) }
+    .timer { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:8px 0 18px }
+    .box { background:#0f1524; border-radius:12px; padding:16px 8px }
+    .num { font-size:clamp(28px,6vw,54px); font-weight:800; line-height:1; }
+    .lbl { margin-top:6px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; opacity:.8 }
+    .bar { height:10px; background:#0f1524; border-radius:999px; overflow:hidden; }
+    .fill { height:100%; width:0%; background:linear-gradient(90deg,#86a8ff,#8ee6ff); }
+    .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px }
+    button, a.button { border:0; border-radius:10px; padding:10px 14px; background:#1b2440; color:#e9eef7;
+                       cursor:pointer; font-weight:600; text-decoration:none }
+    button:hover, a.button:hover { filter:brightness(1.08) }
+    .chip { display:inline-block; padding:6px 10px; border-radius:999px; background:#0f1524; font-size:12px; opacity:.9 }
+    .foot { margin-top:18px; opacity:.7; font-size:12px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="title">倒數計時</h1>
+    <div class="meta">
+      <span id="untilChip" class="chip"></span>
+      <span id="tzChip" class="chip"></span>
+    </div>
+    <div class="card">
+      <div class="timer" aria-live="polite">
+        <div class="box"><div id="d" class="num">0</div><div class="lbl">Days</div></div>
+        <div class="box"><div id="h" class="num">0</div><div class="lbl">Hours</div></div>
+        <div class="box"><div id="m" class="num">0</div><div class="lbl">Minutes</div></div>
+        <div class="box"><div id="s" class="num">0</div><div class="lbl">Seconds</div></div>
+      </div>
+      <div class="bar" title="進度">
+        <div id="fill" class="fill"></div>
+      </div>
+      <div class="row">
+        <button id="copy">Copy Share Link</button>
+        <a id="ics" class="button" href="#" download>Download .ics</a>
+      </div>
+      <div class="foot" id="foot"></div>
+    </div>
+  </div>
+
+  <script>
+    // 讀取 URL 參數：?title=...&until=ISO8601&tz=Asia/Taipei&start=ISO8601
+    const p = new URLSearchParams(location.search);
+    const title = p.get("title") || "倒數計時";
+    const tz = p.get("tz") || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Taipei";
+    const untilStr = p.get("until"); // 建議給 ISO8601, 例如 2025-08-13T09:00:00+08:00
+    const startStr = p.get("start"); // 可選，用於顯示進度條起點
+
+    document.getElementById("title").textContent = title;
+    document.getElementById("tzChip").textContent = `TZ: ${tz}`;
+
+    // 解析時間（若未提供 until，預設 24 小時後）
+    const now = () => new Date();
+    let until = untilStr ? new Date(untilStr) : new Date(now().getTime() + 24*60*60*1000);
+    if (isNaN(until)) until = new Date(now().getTime() + 24*60*60*1000);
+
+    const start = startStr ? new Date(startStr) : now();
+    const fmt = (d) => new Intl.DateTimeFormat('zh-TW', {
+      timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    }).format(d);
+
+    document.getElementById("untilChip").textContent = `Until: ${fmt(until)}`;
+
+    // 更新倒數
+    const dEl = document.getElementById("d"), hEl = document.getElementById("h"),
+          mEl = document.getElementById("m"), sEl = document.getElementById("s"),
+          fillEl = document.getElementById("fill"), footEl = document.getElementById("foot");
+
+    function tick() {
+      const t = now();
+      const diff = until - t;
+      const total = until - start;
+      const clamped = Math.max(0, diff);
+
+      const days = Math.floor(clamped / 86400000);
+      const hours = Math.floor((clamped % 86400000) / 3600000);
+      const mins = Math.floor((clamped % 3600000) / 60000);
+      const secs = Math.floor((clamped % 60000) / 1000);
+
+      dEl.textContent = days;
+      hEl.textContent = hours.toString().padStart(2,'0');
+      mEl.textContent = mins.toString().padStart(2,'0');
+      sEl.textContent = secs.toString().padStart(2,'0');
+
+      // 進度條（若有 start）
+      if (!isNaN(total) && total > 0) {
+        const progress = 100 * (1 - clamped / total);
+        fillEl.style.width = Math.min(100, Math.max(0, progress)) + "%";
+      }
+
+      // 結束訊息
+      if (diff <= 0) {
+        footEl.textContent = "Time’s up!";
+      } else {
+        const untilISO = until.toISOString();
+        footEl.textContent = `Ends at ${untilISO}`;
+      }
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // 一鍵複製目前設定好的分享連結
+    document.getElementById("copy").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(location.href);
+        alert("Copied link!");
+      } catch { alert("Copy failed. You can copy the URL manually."); }
+    };
+
+    // 產生 .ics 檔
+    function makeICS(title, start, end) {
+      const dt = (d)=> d.toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+      return [
+        "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Public Countdown//EN",
+        "BEGIN:VEVENT",
+        `DTSTAMP:${dt(new Date())}`,
+        `DTSTART:${dt(start)}`,
+        `DTEND:${dt(end)}`,
+        `SUMMARY:${title}`,
+        "END:VEVENT","END:VCALENDAR"
+      ].join("\r\n");
+    }
+    const icsA = document.getElementById("ics");
+    const icsBlob = new Blob([makeICS(title, start, until)], {type:"text/calendar"});
+    icsA.href = URL.createObjectURL(icsBlob);
+    icsA.download = `${title.replace(/\s+/g,"_")}.ics`;
+  </script>
+</body>
+</html>
