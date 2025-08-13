@@ -85,14 +85,14 @@
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   document.getElementById('tzChip').textContent = `TZ: ${tz}`;
 
-  function setEndOfDay(year, month, day){
-    return new Date(year, month - 1, day, 23, 59, 59);
+  function setDateTime(year, month, day, hour, minute, second){
+    return new Date(year, month - 1, day, hour, minute, second);
   }
 
   const targets = [
-    { until: setEndOfDay(2025, 8, 13), days: 'd1', hours: 'h1', mins: 'm1', secs: 's1', fill: 'fill1', foot: 'foot1', untilChip: 'until1Chip' },
-    { until: setEndOfDay(2025, 8, 20), days: 'd2', hours: 'h2', mins: 'm2', secs: 's2', fill: 'fill2', foot: 'foot2', untilChip: 'until2Chip' },
-    { until: setEndOfDay(2025, 9, 10), days: 'd3', hours: 'h3', mins: 'm3', secs: 's3', fill: 'fill3', foot: 'foot3', untilChip: 'until3Chip' }
+    { until: setDateTime(2025, 8, 13, 23, 59, 59), start: setDateTime(2025, 8, 13, 0, 0, 0), days: 'd1', hours: 'h1', mins: 'm1', secs: 's1', fill: 'fill1', foot: 'foot1', untilChip: 'until1Chip' },
+    { until: setDateTime(2025, 8, 20, 23, 59, 59), start: setDateTime(2025, 7, 10, 0, 1, 0), days: 'd2', hours: 'h2', mins: 'm2', secs: 's2', fill: 'fill2', foot: 'foot2', untilChip: 'until2Chip' },
+    { until: setDateTime(2025, 9, 10, 23, 59, 59), start: setDateTime(2025, 8, 11, 0, 1, 0), days: 'd3', hours: 'h3', mins: 'm3', secs: 's3', fill: 'fill3', foot: 'foot3', untilChip: 'until3Chip' }
   ];
 
   targets.forEach(cfg => {
@@ -112,8 +112,8 @@
       document.getElementById(cfg.hours).textContent = String(hours).padStart(2,'0');
       document.getElementById(cfg.mins).textContent = String(mins).padStart(2,'0');
       document.getElementById(cfg.secs).textContent = String(secs).padStart(2,'0');
-      if(cfg.fill){
-        const total = cfg.until - now;
+      if(cfg.fill && cfg.start){
+        const total = cfg.until - cfg.start;
         const p = 100 * (1 - clamped / total);
         document.getElementById(cfg.fill).style.width = Math.min(100, Math.max(0, p)) + '%';
       }
