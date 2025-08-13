@@ -1,3 +1,110 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aging Test Completion Countdown</title>
+  <meta name="description" content="Two public countdown timers in one single HTML file. Deploy on GitHub Pages / Netlify / Vercel." />
+  <style>
+    :root {
+      --bg:#0b0f19; --fg:#e9eef7; --panel:#131a2a; --panel2:#0f1524; --chip:#0f1524; --accent1:#86a8ff; --accent2:#8ee6ff;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Noto Sans TC",Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 20px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px}
+    h1{margin:0; font-size:clamp(22px,4.4vw,36px)}
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{background:var(--chip); padding:6px 10px; border-radius:999px; font-size:12px; opacity:.9}
+    .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+    @media (max-width:840px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--panel); border-radius:var(--radius); padding:18px; box-shadow:0 10px 34px rgba(0,0,0,.35)}
+    .title{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px}
+    .title h2{margin:0; font-size:clamp(18px,3.6vw,26px)}
+    .subtitle{opacity:.85; font-size:12px; margin-bottom:14px}
+
+    .timer{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:6px 0 14px}
+    .box{background:var(--panel2); border-radius:14px; padding:14px 8px; text-align:center}
+    .num{font-weight:800; font-size:clamp(26px,6vw,50px); line-height:1}
+    .lbl{text-transform:uppercase; letter-spacing:.08em; font-size:11px; opacity:.8; margin-top:6px}
+
+    .bar{height:10px; background:var(--panel2); border-radius:999px; overflow:hidden; margin:2px 0 8px}
+    .fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent1),var(--accent2))}
+
+    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    button, a.button{border:0; border-radius:10px; padding:10px 14px; background:#1b2440; color:var(--fg); cursor:pointer; font-weight:600; text-decoration:none}
+    button:hover, a.button:hover{filter:brightness(1.08)}
+    .muted{opacity:.7; font-size:12px; margin-top:8px}
+
+    .footer{margin-top:20px; opacity:.85; font-size:12px}
+    code{background:rgba(255,255,255,.06); padding:.2em .4em; border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Aging Test Completion Countdown</h1>
+      <div class="chips">
+        <span id="tzChip" class="chip"></span>
+        <span class="chip">Share: 複製網址即可</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Card 1 -->
+      <section class="card" id="card1">
+        <div class="title">
+          <h2 id="t1">Batch 1 Countdown DOE #/</h2>
+        </div>
+        <div class="subtitle">
+          <span id="until1Chip"></span>
+        </div>
+        <div class="timer" aria-live="polite">
+          <div class="box"><div id="d1" class="num">0</div><div class="lbl">Days</div></div>
+          <div class="box"><div id="h1" class="num">00</div><div class="lbl">Hours</div></div>
+          <div class="box"><div id="m1" class="num">00</div><div class="lbl">Minutes</div></div>
+          <div class="box"><div id="s1" class="num">00</div><div class="lbl">Seconds</div></div>
+        </div>
+        <div class="bar"><div id="fill1" class="fill"></div></div>
+        <div class="row">
+          <button id="copy1">Copy Share Link</button>
+          <a id="ics1" class="button" href="#" download>Download .ics</a>
+        </div>
+        <div class="muted" id="foot1"></div>
+      </section>
+
+      <!-- Card 2 -->
+      <section class="card" id="card2">
+        <div class="title">
+          <h2 id="t2">Batch 2 Countdown DOE #</h2>
+        </div>
+        <div class="subtitle">
+          <span id="until2Chip"></span>
+        </div>
+        <div class="timer" aria-live="polite">
+          <div class="box"><div id="d2" class="num">0</div><div class="lbl">Days</div></div>
+          <div class="box"><div id="h2" class="num">00</div><div class="lbl">Hours</div></div>
+          <div class="box"><div id="m2" class="num">00</div><div class="lbl">Minutes</div></div>
+          <div class="box"><div id="s2" class="num">00</div><div class="lbl">Seconds</div></div>
+        </div>
+        <div class="bar"><div id="fill2" class="fill"></div></div>
+        <div class="row">
+          <button id="copy2">Copy Share Link</button>
+          <a id="ics2" class="button" href="#" download>Download .ics</a>
+        </div>
+        <div class="muted" id="foot2"></div>
+      </section>
+    </div>
+
+    <div class="footer">
+      URL 參數：
+      <code>?title1=...&until1=ISO&start1=ISO&title2=...&until2=ISO&start2=ISO&tz=Asia/Taipei</code><br/>
+      例：<code>?title1=Delta%20Tainan%20Typhoon%20Day&until1=2025-08-13T09:00:00+08:00&title2=Release%20Go-Live&until2=2025-09-01T10:00:00+08:00&tz=Asia/Taipei</code>
+    </div>
+  </div>
+
 <script>
 (function(){
   // --- Helpers ---
@@ -53,3 +160,51 @@
       `SUMMARY:${title}`,
       'END:VEVENT','END:VCALENDAR'
     ].join('\r\n');
+  }
+
+  function bindCard(idx){
+    const title = qs.get('title'+idx) || `Countdown ${idx}`;
+    const until = parseISO(qs.get('until'+idx), idx===1?24:48);
+    const start = parseISO(qs.get('start'+idx)) || new Date();
+
+    const el = {
+      title: document.getElementById('t'+idx),
+      untilChip: document.getElementById('until'+idx+'Chip'),
+      d: document.getElementById('d'+idx),
+      h: document.getElementById('h'+idx),
+      m: document.getElementById('m'+idx),
+      s: document.getElementById('s'+idx),
+      fill: document.getElementById('fill'+idx),
+      foot: document.getElementById('foot'+idx),
+      copy: document.getElementById('copy'+idx),
+      ics: document.getElementById('ics'+idx)
+    };
+
+    el.title.textContent = title;
+    el.untilChip.textContent = `Until: ${fmt(until)}`;
+
+    // Copy link (preserve current params)
+    el.copy.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(location.href); alert('Copied link!'); }
+      catch{ alert('Copy failed. Please copy URL manually.'); }
+    });
+
+    // ICS download
+    const blob = new Blob([makeICS(title, start, until)], {type:'text/calendar'});
+    el.ics.href = URL.createObjectURL(blob);
+    el.ics.download = `${title.replace(/\s+/g,'_')}.ics`;
+
+    return { until, start, el };
+  }
+
+  const c1 = bindCard(1);
+  const c2 = bindCard(2);
+
+  function frame(){ tick({ ...c1, el:c1.el }); tick({ ...c2, el:c2.el }); }
+  frame();
+  setInterval(frame, 1000);
+})();
+</script>
+
+</body>
+</html>
