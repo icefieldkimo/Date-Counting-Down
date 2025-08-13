@@ -16,24 +16,17 @@
     .chip{background:var(--chip);padding:6px 10px;border-radius:999px;font-size:12px;opacity:.9}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
     @media (max-width:1200px){.grid{grid-template-columns:1fr}}
-
     .card{background:var(--panel);border-radius:var(--radius);padding:18px;box-shadow:0 10px 34px rgba(0,0,0,.35)}
     .title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
     .title h2{margin:0;font-size:clamp(18px,3.6vw,26px)}
     .subtitle{opacity:.85;font-size:12px;margin-bottom:14px}
-
     .timer{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:6px 0 14px}
     .box{background:var(--panel2);border-radius:14px;padding:14px 8px;text-align:center}
     .num{font-weight:800;font-size:clamp(26px,6vw,50px);line-height:1}
     .lbl{text-transform:uppercase;letter-spacing:.08em;font-size:11px;opacity:.8;margin-top:6px}
-
     .bar{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:2px 0 8px}
     .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent1),var(--accent2))}
-
     .muted{opacity:.7;font-size:12px;margin-top:8px}
-
-    .footer{margin-top:20px;opacity:.85;font-size:12px}
-    code{background:rgba(255,255,255,.06);padding:.2em .4em;border-radius:6px}
   </style>
 </head>
 <body>
@@ -46,14 +39,9 @@
     </header>
 
     <div class="grid">
-      <!-- Card 1 -->
       <section class="card" id="card1">
-        <div class="title">
-          <h2 id="t1">DOE #1, 576 w/o primer 200Nm</h2>
-        </div>
-        <div class="subtitle">
-          <span id="until1Chip">Until: 2025-08-13</span>
-        </div>
+        <div class="title"><h2 id="t1">DOE #1, 576 w/o primer 200Nm</h2></div>
+        <div class="subtitle"><span id="until1Chip"></span></div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d1" class="num">0</div><div class="lbl">Days</div></div>
           <div class="box"><div id="h1" class="num">00</div><div class="lbl">Hours</div></div>
@@ -64,14 +52,9 @@
         <div class="muted" id="foot1"></div>
       </section>
 
-      <!-- Card 2 -->
       <section class="card" id="card2">
-        <div class="title">
-          <h2 id="t2">DOE #7 567 w/ primer 175Nm</h2>
-        </div>
-        <div class="subtitle">
-          <span id="until2Chip">Until: 2025-08-20</span>
-        </div>
+        <div class="title"><h2 id="t2">DOE #7 567 w/ primer 175Nm</h2></div>
+        <div class="subtitle"><span id="until2Chip"></span></div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d2" class="num">0</div><div class="lbl">Days</div></div>
           <div class="box"><div id="h2" class="num">00</div><div class="lbl">Hours</div></div>
@@ -82,14 +65,9 @@
         <div class="muted" id="foot2"></div>
       </section>
 
-      <!-- Card 3 -->
       <section class="card" id="card3">
-        <div class="title">
-          <h2 id="t3">DOE #9, 10, 11, 12, 13, 14</h2>
-        </div>
-        <div class="subtitle">
-          <span id="until3Chip">Until: 2025-09-10</span>
-        </div>
+        <div class="title"><h2 id="t3">DOE #9, 10, 11, 12, 13, 14</h2></div>
+        <div class="subtitle"><span id="until3Chip"></span></div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d3" class="num">0</div><div class="lbl">Days</div></div>
           <div class="box"><div id="h3" class="num">00</div><div class="lbl">Hours</div></div>
@@ -101,5 +79,50 @@
       </section>
     </div>
   </div>
+
+<script>
+(function(){
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.getElementById('tzChip').textContent = `TZ: ${tz}`;
+
+  function setEndOfDay(year, month, day){
+    return new Date(year, month - 1, day, 23, 59, 59);
+  }
+
+  const targets = [
+    { until: setEndOfDay(2025, 8, 13), days: 'd1', hours: 'h1', mins: 'm1', secs: 's1', fill: 'fill1', foot: 'foot1', untilChip: 'until1Chip' },
+    { until: setEndOfDay(2025, 8, 20), days: 'd2', hours: 'h2', mins: 'm2', secs: 's2', fill: 'fill2', foot: 'foot2', untilChip: 'until2Chip' },
+    { until: setEndOfDay(2025, 9, 10), days: 'd3', hours: 'h3', mins: 'm3', secs: 's3', fill: 'fill3', foot: 'foot3', untilChip: 'until3Chip' }
+  ];
+
+  targets.forEach(cfg => {
+    document.getElementById(cfg.untilChip).textContent = `Until: ${cfg.until.toLocaleString()}`;
+  });
+
+  function tick(){
+    const now = new Date();
+    targets.forEach(cfg => {
+      const diff = cfg.until - now;
+      const clamped = Math.max(0, diff);
+      const days = Math.floor(clamped / 86400000);
+      const hours = Math.floor((clamped % 86400000) / 3600000);
+      const mins = Math.floor((clamped % 3600000) / 60000);
+      const secs = Math.floor((clamped % 60000) / 1000);
+      document.getElementById(cfg.days).textContent = days;
+      document.getElementById(cfg.hours).textContent = String(hours).padStart(2,'0');
+      document.getElementById(cfg.mins).textContent = String(mins).padStart(2,'0');
+      document.getElementById(cfg.secs).textContent = String(secs).padStart(2,'0');
+      if(cfg.fill){
+        const total = cfg.until - now;
+        const p = 100 * (1 - clamped / total);
+        document.getElementById(cfg.fill).style.width = Math.min(100, Math.max(0, p)) + '%';
+      }
+      document.getElementById(cfg.foot).textContent = diff <= 0 ? "Time's up!" : `Ends at ${cfg.until.toISOString()}`;
+    });
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
 </body>
 </html>
