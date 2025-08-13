@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aging Test Completion Countdown</title>
-  <meta name="description" content="Three countdown timers with robust URL/hash params, visible debug, and .ics export." />
+  <meta name="description" content="Three countdown timers." />
   <style>
     :root{--bg:#0b0f19;--fg:#e9eef7;--panel:#131a2a;--panel2:#0f1524;--chip:#0f1524;--accent1:#86a8ff;--accent2:#8ee6ff;--radius:18px}
     *{box-sizing:border-box}
@@ -30,9 +30,6 @@
     .bar{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:2px 0 8px}
     .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent1),var(--accent2))}
 
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    button,a.button{border:0;border-radius:10px;padding:10px 14px;background:#1b2440;color:var(--fg);cursor:pointer;font-weight:600;text-decoration:none}
-    button:hover,a.button:hover{filter:brightness(1.08)}
     .muted{opacity:.7;font-size:12px;margin-top:8px}
 
     .footer{margin-top:20px;opacity:.85;font-size:12px}
@@ -45,7 +42,6 @@
       <h1>Aging Test Completion Countdown</h1>
       <div class="chips">
         <span id="tzChip" class="chip"></span>
-        <span class="chip">Share: 複製網址即可</span>
       </div>
     </header>
 
@@ -56,7 +52,7 @@
           <h2 id="t1">DOE #1, 576 w/o primer 200Nm</h2>
         </div>
         <div class="subtitle">
-          <span id="until1Chip"></span>
+          <span id="until1Chip">Until: 2025-08-13</span>
         </div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d1" class="num">0</div><div class="lbl">Days</div></div>
@@ -65,10 +61,6 @@
           <div class="box"><div id="s1" class="num">00</div><div class="lbl">Seconds</div></div>
         </div>
         <div class="bar"><div id="fill1" class="fill"></div></div>
-        <div class="row">
-          <button id="copy1">Copy Share Link</button>
-          <a id="ics1" class="button" href="#" download>Download .ics</a>
-        </div>
         <div class="muted" id="foot1"></div>
       </section>
 
@@ -78,7 +70,7 @@
           <h2 id="t2">DOE #7 567 w/ primer 175Nm</h2>
         </div>
         <div class="subtitle">
-          <span id="until2Chip"></span>
+          <span id="until2Chip">Until: 2025-08-20</span>
         </div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d2" class="num">0</div><div class="lbl">Days</div></div>
@@ -87,10 +79,6 @@
           <div class="box"><div id="s2" class="num">00</div><div class="lbl">Seconds</div></div>
         </div>
         <div class="bar"><div id="fill2" class="fill"></div></div>
-        <div class="row">
-          <button id="copy2">Copy Share Link</button>
-          <a id="ics2" class="button" href="#" download>Download .ics</a>
-        </div>
         <div class="muted" id="foot2"></div>
       </section>
 
@@ -100,7 +88,7 @@
           <h2 id="t3">DOE #9, 10, 11, 12, 13, 14</h2>
         </div>
         <div class="subtitle">
-          <span id="until3Chip"></span>
+          <span id="until3Chip">Until: 2025-09-10</span>
         </div>
         <div class="timer" aria-live="polite">
           <div class="box"><div id="d3" class="num">0</div><div class="lbl">Days</div></div>
@@ -109,10 +97,6 @@
           <div class="box"><div id="s3" class="num">00</div><div class="lbl">Seconds</div></div>
         </div>
         <div class="bar"><div id="fill3" class="fill"></div></div>
-        <div class="row">
-          <button id="copy3">Copy Share Link</button>
-          <a id="ics3" class="button" href="#" download>Download .ics</a>
-        </div>
         <div class="muted" id="foot3"></div>
       </section>
     </div>
