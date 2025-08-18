@@ -96,12 +96,20 @@
   ];
 
   targets.forEach(cfg => {
-    document.getElementById(cfg.untilChip).textContent = `Until: ${cfg.until.toLocaleString()}`;
+    if(cfg.until){
+      document.getElementById(cfg.untilChip).textContent = `Until: ${cfg.until.toLocaleString()}`;
+    } else {
+      document.getElementById(cfg.untilChip).textContent = `Not started yet`;
+    }
   });
 
   function tick(){
     const now = new Date();
     targets.forEach(cfg => {
+      if(!cfg.until){
+        document.getElementById(cfg.foot).textContent = "Not started yet";
+        return;
+      }
       const diff = cfg.until - now;
       const clamped = Math.max(0, diff);
       const days = Math.floor(clamped / 86400000);
@@ -117,7 +125,7 @@
         const p = 100 * (1 - clamped / total);
         document.getElementById(cfg.fill).style.width = Math.min(100, Math.max(0, p)) + '%';
       }
-      document.getElementById(cfg.foot).textContent = diff <= 0 ? "Time's up!" : `Ends at ${cfg.until.toISOString()}`;
+      document.getElementById(cfg.foot).textContent = diff <= 0 ? "Time's up!" : `Ends at ${cfg.until.toLocaleString()}`;
     });
   }
   tick();
